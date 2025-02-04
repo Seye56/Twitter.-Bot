@@ -11,17 +11,26 @@ import textwrap
 import logging
   
 # Load environment variables from .env file
-load_dotenv("/Users/oluwaseyeawoyemi/Desktop/app design/Twitter/files.env")
+load_dotenv("Twitter/files.env")
 
 # Retrieve sensitive information from environment variables
 API_KEY = os.getenv("API_KEY")
 API_KEY_SECRET = os.getenv("API_KEY_SECRET")
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET = os.getenv("ACCESS_TOKEN_SECRET")
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
 
 # Check if Twitter API credentials are missing
 if not API_KEY or not API_KEY_SECRET or not ACCESS_TOKEN or not ACCESS_TOKEN_SECRET:
     raise ValueError("Twitter API credentials are missing. Check your .env file.")
+
+client = tweepy.Client(
+    consumer_key=API_KEY,
+    consumer_secret=API_KEY_SECRET,
+    access_token=ACCESS_TOKEN,
+    access_token_secret=ACCESS_TOKEN_SECRET,
+    bearer_token=BEARER_TOKEN
+)
 
 # Authenticate to Twitter
 auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
@@ -159,7 +168,7 @@ def tweet_quote():
 
         # Upload the image and tweet the quote
         media = api.media_upload(image_path)
-        api.update_status(status=quote, media_ids=[media.media_id])
+        client.create_tweet(text=quote, media_ids=[media.media_id])
         logging.info(f"Tweeted: {quote}")
 
     except Exception as e:

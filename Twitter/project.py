@@ -79,26 +79,45 @@ quotes = [
 ]
 
 backgrounds =[
-    "images/image1.jpg",
-    "images/image2.jpg",
-    "images/image3.jpg",
-    "images/image4.jpg",
-    "images/image5.jpg",
-    "images/image6.jpg",
-    "images/image7.jpg",
-    "images/image8.jpg",
-    "images/image9.jpg",
-    "images/image10.jpg",
-    "images/image11.jpg",
-    "images/image12.jpg",
-    "images/image13.jpg",
+    "Twitter/images/image1.jpg",
+    "Twitter/images/image2.jpg",
+    "Twitter/images/image3.jpg",
+    "Twitter/images/image4.jpg",
+    "Twitter/images/image5.jpg",
+    "Twitter/images/image6.jpg",
+    "Twitter/images/image7.jpg",
+    "Twitter/images/image8.jpg",
+    "Twitter/images/image9.jpg",
+    "Twitter/images/image10.jpg",
+    "Twitter/images/image11.jpg",
+    "Twitter/images/image12.jpg",
+    "Twitter/images/image13.jpg",
 ]
 
 #def draw_text(draw, text, position, font, max_width):
-def draw_text(draw, text, position, font, max_width):
-    """Draw text with word wrapping."""
+def draw_text(draw, text, position, font, max_width, image_width):
+    """Draw text with word wrapping and central alignment."""
     lines = textwrap.wrap(text, width=max_width)  # Wrap text to fit within max_width
-    draw.text(position, lines, font=font, fill="white", align="center")
+    x, y = position  # Starting position for the text
+
+    # Calculate total height of the text block
+    total_height = sum(font.getbbox(line)[3] - font.getbbox(line)[1] for line in lines)
+
+    # Adjust y to center the text block vertically
+    y = (image_width - total_height) // 2
+
+    for line in lines:
+        # Calculate the width of the current line
+        line_width = font.getbbox(line)[2] - font.getbbox(line)[0]
+
+        # Adjust x to center the line horizontally
+        x = (image_width - line_width) // 2
+
+        # Draw the line
+        draw.text((x, y), line, font=font, fill="white", align="center")
+
+        # Move to the next line
+        y += font.getbbox(line)[3] - font.getbbox(line)[1]
 
 # Create a function to generate a random quote with a random image
 def create_image_with_background(quote):
@@ -111,19 +130,23 @@ def create_image_with_background(quote):
 
     # Add the quote to the image
     draw = ImageDraw.Draw(bg_img)
-    font = ImageFont.truetype("arial.ttf", size=40)
+    font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf", size=30) 
+
 
     # Define text position and max width for wrapping
     position = (50, 50)  # (x, y) coordinates for the text
     max_width = 30  # Maximum number of characters per line
+    image_width = bg_img.width
 
     # Draw the text with word wrapping
-    draw_text(draw, quote, position, font, max_width)
+    draw_text(draw, quote, position, font, max_width, image_width)
 
     # Save the image
-    output_image_path = "images/quote.png"
+    output_image_path = "Twitter/images/quote.png"
     bg_img.save(output_image_path)
     return output_image_path
+
+
 
 def tweet_quote():
     try:
@@ -143,9 +166,11 @@ def tweet_quote():
         logging.error(f"Failed to tweet: {e}")
 
 
-# Schedule the tweet to be sent every day at 9:00 AM
-schedule.every().day.at("08:00").do(tweet_quote)
+
+#tweet code for testing
+tweet_quote()
+
 # Keep the script running
 while True:
     schedule.run_pending()
-    time.sleep(60)
+    time.sleep(1)

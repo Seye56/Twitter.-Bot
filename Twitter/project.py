@@ -141,6 +141,10 @@ def tweet_quote():
 
     except Exception as e:
         logging.error(f"Failed to tweet: {e}")
+
+
+# Schedule the tweet to be sent every day at 9:00 AM
+schedule.every().day.at("08:00").do(tweet_quote)
 # Keep the script running
 while True:
     schedule.run_pending()
